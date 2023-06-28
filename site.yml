@@ -1,0 +1,44 @@
+---
+
+- hosts: all
+  become: true
+  tasks:
+
+  - name: install update (CentOS)
+    dnf:
+      update_only: yes
+      update_cache: yes
+    when: ansible_distribution == "CentOS"
+
+  - name: install updates 'Ubuntu)
+    apt:
+      upgrade: dist
+      update_cache: yes
+    when: ansible_distribution == "Ubuntu"
+
+- hosts: web_servers
+  become: true
+  tasks:
+    
+
+  - name: install apache2 package && php packages for ubuntu
+    apt:
+      name:
+        - apache2
+        - libapache2-mod-php
+      state: latest
+    when: ansible_distribution == "ubuntu"
+
+  - name: install https-centos package && php packages
+    dnf:
+      name:
+       - httpd
+       - php
+      state: latest
+    when: ansible_distribution == "Centos"
+  - name: start httpd (CentOS)
+    tags: apache,centos, httpd
+    service:
+      name: httpd
+      state: started
+    when: ansible_distribution == "CentOS"
